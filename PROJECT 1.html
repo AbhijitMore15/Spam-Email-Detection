@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Email Fraud Detector</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .email-list {
+      margin-top: 20px;
+    }
+    .email-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f9f9f9;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .email-info {
+      flex-grow: 1;
+    }
+    .delete-btn {
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="loginPage">
+  <h2>Login</h2>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<div class="container" id="dashboardPage" style="display:none;">
+  <h2>Fraud Emails</h2>
+  <div class="email-list" id="emailList">
+    <!-- Fraud emails will be loaded here -->
+  </div>
+</div>
+
+<script>
+  const fraudEmails = [
+    { id: 1, sender: "scammer@example.com", subject: "You've won $1,000,000!" },
+    { id: 2, sender: "fakebank@bank.com", subject: "Urgent account verification needed" },
+    { id: 3, sender: "unknown@randommail.com", subject: "Claim your free gift now" }
+  ];
+
+  function login() {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+    if (email && pass) {
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("dashboardPage").style.display = "block";
+      loadEmails();
+    } else {
+      alert("Please enter email and password");
+    }
+  }
+
+  function loadEmails() {
+    const list = document.getElementById("emailList");
+    list.innerHTML = "";
+    fraudEmails.forEach((email, index) => {
+      const item = document.createElement("div");
+      item.className = "email-item";
+      item.innerHTML = `
+        <div class="email-info">
+          <strong>From:</strong> ${email.sender} <br>
+          <strong>Subject:</strong> ${email.subject}
+        </div>
+        <button class="delete-btn" onclick="deleteEmail(${index})">Delete</button>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  function deleteEmail(index) {
+    fraudEmails.splice(index, 1);
+    loadEmails();
+  }
+</script>
+
+</body>
+</html>
