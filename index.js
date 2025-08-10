@@ -1,43 +1,43 @@
 const express = require('express');
-const cors = require('cors');
+const path = require('path');
 const db = require('./db');
+require('dotenv').config();
 
 const app = express();
-app.use(cors());
+const PORT = 3000;
+
+// Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.post('/api/submit-email', (req, res) => {
-  const { sender_email, subject, body } = req.body;
-
-  const query = 'INSERT INTO emails (sender_email, subject, body, timestamp) VALUES (?, ?, ?, NOW())';
-  db.query(query, [sender_email, subject, body], (err, result) => {
-    if (err) {
-      console.error('Error inserting email:', err);
-      return res.status(500).send('Database error');
-    }
-
-    const spamKeywords = ['lottery', 'urgent', 'win', 'bank login', 'prize'];
-    let resultType = 'Safe';
-    let score = 0;
-
-    spamKeywords.forEach((word) => {
-      if (body.toLowerCase().includes(word)) {
-        resultType = 'Spam';
-        score += 20;
-      }
-    });
-
-    const insertResultQuery = 'INSERT INTO results (email_id, result_type, score) VALUES (?, ?, ?)';
-    db.query(insertResultQuery, [result.insertId, resultType, score], (err) => {
-      if (err) {
-        console.error('Error inserting result:', err);
-        return res.status(500).send('Database error');
-      }
-      res.json({ message: 'Email processed', result: resultType, score });
-    });
-  });
+// Route: Serve HTML
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+// Route: Spam Detection
+app.post('/check', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).send('Email is required');
+
+  const isSpam = ['spam', 'offer', 'win', 'lottery'].some(keyword =>
+    email.toLowerCase().includes(keyword)
+  );
+
+  try {
+    await db.query(
+      'INSERT INTO emails (email, status) VALUES (?, ?)',
+      [email, isSpam ? 'spam' : 'safe']
+    );
+    res.send(isSpam ? 'Spam detected' : 'Email is safe');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
