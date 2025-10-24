@@ -1,0 +1,175 @@
+⚙️ STEP 1: Choose the AI mode
+
+You can support both:
+
+Offline Mode (Free, Local CPU):
+Uses @xenova/transformers (as we set up earlier).
+
+Online Mode (Cloud-based AI):
+Uses Hugging Face Inference API — free tier supports ~30 calls/minute.
+
+We can toggle between them using .env:
+
+AI_MODE=offline   # or 'online'
+HF_API_KEY=your_free_huggingface_token
+
+🤖 STEP 2: Unified AI Detector
+
+Create aiSpamDetector.js — it handles both modes automatically.
+
+import dotenv from 'dotenv';
+dotenv.config();
+
+let detectSpamAI;
+
+if (process.env.AI_MODE === 'offline') {
+  console.log('🧠 Using local AI model (offline mode)');
+  const { detectSpamAI: localDetect } = await import('./aiSpamDetectorLocal.js');
+  detectSpamAI = localDetect;
+} else {
+  console.log('☁️ Using online AI model (Hugging Face)');
+  const { detectSpamAI: onlineDetect } = await import('./aiSpamDetectorOnline.js');
+  detectSpamAI = onlineDetect;
+}
+
+export { detectSpamAI };
+
+☁️ STEP 3: Online AI Model (optional but more accurate)
+
+Create aiSpamDetectorOnline.js:
+
+import { HfInference } from '@huggingface/inference';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const hf = new HfInference(process.env.HF_API_KEY);
+
+export async function detectSpamAI(emailText) {
+  try {
+    const result = await hf.textClassification({
+      model: 'mrm8488/bert-tiny-finetuned-sms-spam-detection',
+      inputs: emailText,
+    });
+
+    const label = result[0].label.toLowerCase();
+    return label.includes('spam');
+  } catch (err) {
+    console.error('AI detection error:', err.message);
+    return false;
+  }
+}
+
+
+⚠️ Hugging Face free tier is free (limited usage). You can create a token here:
+https://huggingface.co/settings/tokens
+
+🌐 STEP 4: Simple Online Dashboard (frontend)
+
+Add a new file public/index.html:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Email Spam Detector</title>
+  <style>
+    body { font-family: Arial; margin: 40px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { padding: 8px 12px; border: 1px solid #ccc; }
+    th { background: #f2f2f2; }
+    .spam { background: #ffdddd; }
+    .safe { background: #ddffdd; }
+  </style>
+</head>
+<body>
+  <h1>📬 AI Email Spam Detection</h1>
+  <table id="emailsTable">
+    <tr><th>ID</th><th>Content</th><th>Status</th></tr>
+  </table>
+
+  <script>
+    async function loadEmails() {
+      const res = await fetch('/emails');
+      const emails = await res.json();
+      const table = document.getElementById('emailsTable');
+      emails.forEach(e => {
+        const row = document.createElement('tr');
+        row.className = e.status;
+        row.innerHTML = `<td>${e.id}</td><td>${e.content}</td><td>${e.status}</td>`;
+        table.appendChild(row);
+      });
+    }
+    loadEmails();
+  </script>
+</body>
+</html>
+
+🖥️ STEP 5: Add Dashboard Route in server.js
+
+Extend your backend to serve both API + frontend.
+
+import express from 'express';
+import dotenv from 'dotenv';
+import db from './db.js';
+import { startIMAP } from './imapClient.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+dotenv.config();
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// setup static serving
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// dashboard API
+app.get('/emails', async (req, res) => {
+  const [rows] = await db.query('SELECT * FROM emails ORDER BY id DESC');
+  res.json(rows);
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  startIMAP();
+});
+
+🚀 STEP 6: Run It Online
+Option 1 — Run Locally (Development)
+npm install
+npm start
+
+
+Then open 👉 http://localhost:3000
+
+Option 2 — Deploy Online (Free Hosting)
+
+You can deploy this to any free host:
+
+Render (https://render.com
+)
+
+Railway (https://railway.app
+)
+
+Fly.io
+
+Vercel (for frontend + API)
+
+You’ll just need:
+
+Add your .env variables in their dashboard
+
+Make sure MySQL is reachable (e.g., via ClearDB or Planetscale)
+
+✅ Result
+
+Once deployed:
+
+The app keeps running on your server (or cloud)
+
+IMAP auto-fetches new emails
+
+AI (local or online) classifies them automatically
+
+You can open / in your browser to see all results live
