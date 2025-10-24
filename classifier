@@ -1,0 +1,25 @@
+// spamClassifier.js
+const natural = require('natural');
+const classifier = new natural.BayesClassifier();
+
+// 🧠 Train with sample spam/ham data
+classifier.addDocument('win money now', 'spam');
+classifier.addDocument('you have won a lottery', 'spam');
+classifier.addDocument('free offer for you', 'spam');
+classifier.addDocument('click here to buy', 'spam');
+
+classifier.addDocument('meeting tomorrow', 'ham');
+classifier.addDocument('project report attached', 'ham');
+classifier.addDocument('see you at office', 'ham');
+classifier.addDocument('let us schedule a call', 'ham');
+
+// Train the model once
+classifier.train();
+
+// Export prediction function
+function detectSpam(emailText) {
+  const result = classifier.classify(emailText);
+  return result === 'spam';
+}
+
+module.exports = detectSpam;
