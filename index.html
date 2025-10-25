@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Email Spam Detector</title>
+  <style>
+    body { font-family: Arial; background-color: #f4f6f8; }
+    .container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    button { width: 100%; padding: 12px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    button:hover { background-color: #0056b3; }
+    #spamList div { border-bottom: 1px solid #ccc; padding: 10px; }
+    input { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+<div class="container" id="loginPage">
+  <h2>Check Gmail for Spam Emails</h2>
+  <input type="email" id="email" placeholder="Enter your Gmail address">
+  <button onclick="login()">Verify with Google</button>
+</div>
+
+<div class="container" id="dashboardPage" style="display:none;">
+  <h2>Spam Emails</h2>
+  <p id="spamCount"></p>
+  <div id="spamList"></div>
+</div>
+
+<script>
+let userEmail = new URLSearchParams(window.location.search).get("email") || localStorage.getItem("userEmail") || "";
+
+async function login() {
+  userEmail = document.getElementById("email").value;
+  if (!userEmail) return alert("Please enter your Gmail address.");
+  localStorage.setItem("userEmail", userEmail);
+  const r = await fetch("/authUrl");
+  const data = await r.json();
+  window.location = data.url;
+}
+
+async function loadSpam() {
+  try {
+    const r = await fetch(`/api/scan?email=${encodeURIComponent(userEmail)}`);
+    const data = await r.json();
+    if (!r.ok) {
+      throw new Error(data.error || "Scan failed");
+    }
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("dashboardPage").style.display = "block";
+    document.getElementById("spamCount").innerText = `Total Spam: ${data.spamCount}`;
+    document.getElementById("spamList").innerHTML = data.messages
+      .map(m => `<div><strong>From:</strong> ${m.from}<br>
+                 <strong>Subject:</strong> ${m.subject}<br>
+                 <button onclick="deleteEmail('${m.id}')">Delete</button></div>`)
+      .join("");
+  } catch (error) {
+    console.error("Load spam error:", error);
+    alert(error.message || "Please authenticate first.");
+    document.getElementById("loginPage").style.display = "block";
+    document.getElementById("dashboardPage").style.display = "none";
+  }
+}
+
+async function deleteEmail(id) {
+  try {
+    const r = await fetch("/api/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, email: userEmail })
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      throw new Error(data.error || "Delete failed");
+    }
+    loadSpam();
+  } catch (error) {
+    console.error("Delete error:", error);
+    alert(error.message || "Failed to delete email.");
+  }
+}
+
+window.onload = () => {
+  if (userEmail) {
+    document.getElementById("email").value = userEmail;
+    loadSpam();
+  }
+};
+</script>
+
+</body>
+</html>
