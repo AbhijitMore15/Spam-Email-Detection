@@ -1,176 +1,231 @@
-# 📧 SpamEmailDetection (Email Spam Detector)
+# 📧 Spam Email Detection System
 
-![Node.js](https://img.shields.io/badge/Node.js-18+-green?logo=node.js)
-![Express](https://img.shields.io/badge/Express.js-Backend-blue?logo=express)
-![GmailAPI](https://img.shields.io/badge/Gmail-API-red?logo=gmail)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-
-> A simple and secure web application that connects to your Gmail account, scans for spam emails, and lets you delete them easily — built with **Node.js**, **Express**, and the **Gmail API**.
+A secure web application that connects to your Gmail account, identifies spam emails, and allows users to review or delete them effortlessly. Built using **Node.js**, **Express.js**, and the **Gmail API**, this project demonstrates real-world API integration and authentication workflows.
 
 ---
 
-## 🖼️ Preview
+## 🚀 Overview
 
-<p align="center">
-  <img src="assets/dashboard-preview.png" alt="SpamEmailDetection Dashboard Preview" width="600"/>
-</p>
+Spam emails clutter inboxes and reduce productivity. This project provides a simple yet effective solution by:
 
-*(Add a screenshot of your dashboard UI inside `/assets/dashboard-preview.png` to make your README look polished)*
+* Connecting securely to Gmail using OAuth 2.0
+* Fetching spam emails from the user's mailbox
+* Displaying them in a clean dashboard
+* Allowing users to manage (delete/review) spam efficiently
+
+This project is ideal for learning **API integration, authentication, and backend development**.
 
 ---
 
-## 🚀 Features
+## ✨ Key Features
 
-✅ **Google OAuth 2.0 Authentication** – Login securely with your Gmail account.  
-✅ **Spam Detection** – Fetch spam emails from your Gmail Spam folder.  
-✅ **Email Management** – Delete or review spam emails directly from the dashboard.  
-✅ **Lightweight Frontend** – Simple HTML/CSS/JS interface for speed and simplicity.  
-✅ **Educational Purpose** – Ideal for learning Gmail API integration.
+* 🔐 **Secure Authentication**
+  Google OAuth 2.0 ensures safe login without storing passwords
+
+* 📥 **Spam Detection via Gmail API**
+  Fetches emails directly from Gmail’s Spam folder
+
+* 🧹 **Email Management**
+  View and delete spam emails easily
+
+* ⚡ **Lightweight UI**
+  Fast and simple frontend using HTML, CSS, and JavaScript
+
+* 🎯 **Educational Use Case**
+  Demonstrates real-world usage of APIs and authentication systems
 
 ---
 
 ## 🧰 Tech Stack
 
-| Layer | Technology |
-|-------|-------------|
-| Backend | Node.js + Express.js |
-| API | Google Gmail API |
-| Authentication | OAuth 2.0 |
-| Frontend | HTML, CSS, JavaScript |
-| Hosting (optional) | Localhost / Render / Vercel |
+| Layer           | Technology Used         |
+| --------------- | ----------------------- |
+| Backend         | Node.js, Express.js     |
+| API Integration | Gmail API (Google APIs) |
+| Authentication  | OAuth 2.0               |
+| Frontend        | HTML, CSS, JavaScript   |
+| Environment     | Node.js Runtime         |
 
 ---
 
-## ⚙️ Setup and Installation
+## 📁 Project Structure
 
-### 1️⃣ Clone the Repository
-```bash
-git clone https://github.com/<your-username>/SpamEmailDetection.git
-cd SpamEmailDetection
-````
-
-### 2️⃣ Install Dependencies
-
-```bash
-npm install express googleapis
+```
+Spam-Email-Detection/
+│
+├── server.js              # Main backend server
+├── index.html             # Frontend UI
+├── package.json           # Project dependencies
+├── package-lock.json      # Dependency lock file
+├── .env                   # Environment variables (optional)
+├── client_secret.json     # Google OAuth credentials
+├── README.md              # Project documentation
+└── assets/
+    └── dashboard-preview.png
 ```
 
 ---
 
-## 🔑 Google Cloud Setup (Gmail API)
+## ⚙️ Installation & Setup
 
-1. Go to the **[Google Cloud Console](https://console.cloud.google.com/)**
+### 1️⃣ Clone the Repository
 
-2. Enable the **Gmail API** for your project
+```bash
+git clone https://github.com/your-username/Spam-Email-Detection.git
+cd Spam-Email-Detection
+```
 
-3. Create **OAuth 2.0 Credentials**:
+---
 
-   * Application type: **Web Application**
-   * Name: `SpamEmailDetection`
-   * Authorized redirect URI:
+### 2️⃣ Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+### 3️⃣ Set Up Google Cloud (Gmail API)
+
+1. Go to: https://console.cloud.google.com/
+
+2. Create a new project
+
+3. Enable **Gmail API**
+
+4. Create **OAuth 2.0 Credentials**:
+
+   * Application Type: **Web Application**
+   * Redirect URI:
 
      ```
      http://localhost:3000/oauth2callback
      ```
 
-4. Copy the generated **Client ID** and **Client Secret**
-
-5. Set up your **OAuth consent screen**:
-
-   * App type: **External**
-   * Add your own Gmail under **Test Users**
-   * Save and publish (you don’t need verification for test users)
+5. Download credentials and place them in your project
 
 ---
 
-## 🧩 Environment Variables (Optional)
+### 4️⃣ Configure Environment Variables (Recommended)
 
-Create a `.env` file to store your credentials:
+Create a `.env` file:
 
 ```
-CLIENT_ID=your-google-client-id
-CLIENT_SECRET=your-google-client-secret
+CLIENT_ID=your-client-id
+CLIENT_SECRET=your-client-secret
 REDIRECT_URI=http://localhost:3000/oauth2callback
 ```
 
-In `server.js`, add:
+Update `server.js`:
 
 ```js
 require("dotenv").config();
-
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI;
 ```
 
 ---
 
-## 📂 File Structure
+## ▶️ Running the Application
 
-```
-📦 SpamEmailDetection
- ┣ 📜 server.js
- ┣ 📜 http.html
- ┣ 📜 package.json
- ┣ 📜 README.md
- ┗ 📂 assets/
-     ┗ 📸 dashboard-preview.png
-
-
-## 🖥️ Run the App
+Start the server:
 
 ```bash
 node server.js
+```
 
+Open your browser:
 
-Then visit:
-👉 **[http://localhost:3000](http://localhost:3000)**
+```
+http://localhost:3000
+```
 
-Login with your **test Gmail account**, authorize the app, and view spam emails on the dashboard.
+---
 
+## 🔄 Application Workflow
 
+1. User logs in via Google OAuth
+2. App requests Gmail permissions
+3. Spam emails are fetched using Gmail API
+4. Emails are displayed on dashboard
+5. User can delete or review emails
 
-## ⚠️ Common Issues & Fixes
+---
 
-| Problem                                     | Cause                                              | Fix                                                            |
-| ------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------- |
-| `Access blocked: App has not been verified` | App uses Gmail scopes & is unverified              | Add your Gmail under **Test Users** in OAuth consent screen    |
-| Redirect URI mismatch                       | Redirect URL differs from your Cloud Console setup | Ensure exact match with `http://localhost:3000/oauth2callback` |
-| No emails displayed                         | Tokens missing or expired                          | Restart the server and re-authenticate                         |
-| “Failed to scan emails”                     | Gmail API permission error                         | Revoke and reauthorize app access                              |
+## ⚠️ Common Issues & Solutions
 
+| Issue                 | Cause             | Solution                        |
+| --------------------- | ----------------- | ------------------------------- |
+| Access blocked        | App not verified  | Add Gmail to **Test Users**     |
+| Redirect URI mismatch | Incorrect URI     | Match exactly in Google Console |
+| Emails not loading    | Token expired     | Restart app and login again     |
+| API error             | Permissions issue | Reauthorize access              |
 
-## 🔒 Privacy & Security
+---
 
-* The app uses **OAuth2** for secure Gmail access.
-* No passwords are stored — only temporary tokens (in-memory).
-* Tokens are reset each time you restart the server.
-* For production, store tokens in a secure database and use HTTPS.
+## 🔒 Security Considerations
 
+* Uses **OAuth 2.0** — no passwords stored
+* Tokens are stored temporarily (in-memory)
+* No persistent storage of user data
+* For production:
 
+  * Use HTTPS
+  * Store tokens securely (DB)
+
+---
 
 ## 🌐 Deployment (Optional)
 
-If you want to host this project online:
+You can deploy this project using:
 
-* Deploy backend on [Render](https://render.com/), [Vercel](https://vercel.com/), or [Railway](https://railway.app/)
-* Update your **Redirect URI** in Google Cloud Console to match your hosted URL
-  (e.g., `https://your-app-name.onrender.com/oauth2callback`)
+* Render
+* Railway
+* Vercel (for frontend + serverless)
 
+⚠️ Update Redirect URI after deployment:
+
+```
+https://your-app-url.com/oauth2callback
+```
+
+---
+
+## 📌 Future Improvements
+
+* 🔍 Add ML-based spam classification
+* 📊 Email analytics dashboard
+* 💾 Persistent token storage
+* 📱 Responsive UI
+* ⚡ Pagination for large email sets
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+Feel free to fork the repository and submit a pull request.
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License**.
+
+---
 
 ## ⭐ Acknowledgements
 
-* [Google APIs Node.js Client](https://github.com/googleapis/google-api-nodejs-client)
-* [Gmail API Docs](https://developers.google.com/gmail/api)
-* [Express.js](https://expressjs.com/)
-* [Node.js](https://nodejs.org/en/)
+* Google Gmail API
+* Google APIs Node.js Client
+* Express.js
+* Node.js
 
+---
 
+## 👨‍💻 Author
 
-## 🏁 License
+**Abhijit More**
+Aspiring Data Engineer / Data Scientist
 
-This project is licensed under the **MIT License** — feel free to use and modify it.
+---
 
-
-
-
+> ⭐ If you found this project useful, consider giving it a star!
