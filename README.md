@@ -221,10 +221,10 @@ This project is licensed under the **MIT License**.
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Authors
 
-**Abhijit More**
-Aspiring Data Engineer / Data Scientist
+**Abhijit More** and **Arsh Mishra**
+
 
 ---
 
